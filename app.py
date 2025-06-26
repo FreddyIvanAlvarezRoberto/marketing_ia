@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
@@ -70,6 +70,20 @@ if not os.path.exists("static/corr_plot.png"):
 def index():
     table_html = df_raw.head(10).to_html(classes='table table-striped table-bordered', border=0, index=False)
     return render_template("index.html", table=table_html)
+
+@app.route('/plot/<tipo>', methods=['GET'])
+def get_plot(tipo):
+    try:
+        if tipo == "pca":
+            return send_file("static/grafico3d.html", mimetype='text/html')
+        elif tipo == "correlation":
+            return send_file("static/corr_plot.png", mimetype='image/png')
+        elif tipo == "ventas":
+            return send_file("static/bar_plot.html", mimetype='text/html')
+        else:
+            return jsonify({"error": "Visualización no encontrada"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
